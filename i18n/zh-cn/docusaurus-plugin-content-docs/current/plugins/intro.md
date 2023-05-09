@@ -144,17 +144,21 @@ curl http://exmaple.com/foo -H 'exmaple-key: 123'
 Wasm（WebAssembly的缩写）是基于堆栈的虚拟机的二进制指令格式。Wasm 使得高级语言例如 C/C++/Golang 能够在浏览器中运行。如今在网关侧，Higress 也已完成对 Wasm 的支持，开发者可以通过高级语言 C/C++/Go/Rust 并按照 proxy-wasm 规范来完成 Wasm 插件的开发。
 
 ### 插件生效流程
-![image](https://user-images.githubusercontent.com/8651857/236986471-79c9bcfd-2a59-450c-a9f2-809d1135d937.png)
-1.用户将代码编译成 wasm 文件
-2.用户将 wasm 文件构建成 docker 镜像
-3.用户将 docker 镜像推送至镜像仓库
-4.用户创建 WasmPlugin 资源
-5.Istio watch 到 WasmPlugin 资源的变化
-6.Higress Gateway 中的 xDS proxy 进程从 Istio 获取到配置，发现插件的镜像地址
-7.xDS proxy 从镜像仓库拉取镜像
-8.xDS proxy 从镜像中提取出 wasm 文件
-9.Higress Gateway 中的 envoy 进程从 xDS proxy 获取到配置，发现 wasm 文件的本地路径
-10.envoy 从本地文件中加载 wasm 文件
+![wasm.png](https://img.alicdn.com/imgextra/i4/O1CN01PO4HYC1h7qYHonHHZ_!!6000000004231-2-tps-1100-537.png)
+
+1. 用户将代码编译成 wasm 文件
+2. 用户将 wasm 文件构建成 docker 镜像
+3. 用户将 docker 镜像推送至镜像仓库
+4. 用户创建 WasmPlugin 资源
+5. Istio watch 到 WasmPlugin 资源的变化
+6. Higress Gateway 中的 xDS proxy 进程从 Istio 获取到配置，发现插件的镜像地址
+7. xDS proxy 从镜像仓库拉取镜像
+8. xDS proxy 从镜像中提取出 wasm 文件
+9. Higress Gateway 中的 envoy 进程从 xDS proxy 获取到配置，发现 wasm 文件的本地路径
+10. envoy 从本地文件中加载 wasm 文件
 
 ### Wasm 插件如何做到变更时流量无损
 Higress 在这里通过 envoy 获取配置并加载 wasm 文件使用到了 ECDS (Extension Config Discovery Service)的机制，实现了 wasm 文件更新，直接热加载，不会导致任何连接中断，业务流量完全无损。
+
+### 插件执行顺序编排
+插件的执行是循序执行的，通过插件链在组装插件的执行顺序。？？
